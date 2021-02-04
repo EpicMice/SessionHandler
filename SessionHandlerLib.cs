@@ -72,8 +72,8 @@ namespace SessionHandler
 
             // this.TimeStamps.Enqueue(GetTimeStamp(TimeFrame));
 
-            ManualResetEvent constructing = new ManualResetEvent(true);
-
+            ManualResetEvent constructing = new ManualResetEvent(false);
+            bool isGoing = false;
             Task.Run(() =>
             {
                 Task.Delay(500).Wait();
@@ -108,11 +108,18 @@ namespace SessionHandler
                         //    Console.WriteLine("Changed Stamp!" + new DateTime(long.Parse(stamp)));
                     }
                     //Set this so that the task actually gets to a point that the rest of the object is able to function.
+                    if (!isGoing)
+                    {
+                        Console.WriteLine("SETTING SETTING SETTING SETTING SETTING");
+                    }
                     constructing.Set();
                 }
             });
             //Wait for the prior task to set up the initial timestamp.
+            Console.WriteLine("WAITING WAITING WAITING WAITING ");
             constructing.WaitOne();
+            isGoing = true;
+            Console.WriteLine("GOING GOING GOING GOING GOING ");
 
             Task.Run(() =>
             {
@@ -224,7 +231,7 @@ namespace SessionHandler
         {
 
             string filename;
-            string current_stamp = this.TimeStamps.Last();
+            string current_stamp = this.TimeStamps.LastOrDefault();
             string nFilename = this.SessionLocation + "/" + current_stamp + "_" + session_id + ".ses";
 
             string existing_file = null;
